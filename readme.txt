@@ -13,7 +13,7 @@ This does not bring in any other Boostrap javascript or CSS functionality.
 
 This section describes how to install the plugin:
 
-1. Upload the `bootstrap` folder to the `/wp-content/plugins/` directory
+1. Upload the `bootstrap-modals` folder to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Usage ==
