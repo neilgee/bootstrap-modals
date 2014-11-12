@@ -3,7 +3,7 @@ Read Me
 
 == Description ==
 
-This plugin adds Bootstrap v3.2.0 Modal functionality to WordPress.
+This plugin adds Bootstrap v3.3.1 Modal functionality to WordPress.
 
 It adds just the Bootstrap Javascript Plugin for Modals and associated CSS.  
 
@@ -21,10 +21,12 @@ Use either the Bootstrap API markup or Javascript to trigger the modal windows, 
 
 There is also further usage information here: http://coolestguidesontheplanet.com/bootstrap/modal.php
 
-There is no WP-Admin interface, mark up needs to be directly applied to post/page or widget area.
+There is no WP-Admin interface, HTML mark up needs to be directly applied to post/page or widget area.
 
 == Changelog ==
 
 = 1.0.0 * Initial release.
 
 = 1.0.1 Updated with Bootstrap 3.2.0 - https://github.com/twbs/bootstrap/releases/tag/v3.2.0
+
+= 1.0.2 Updated with Bootstrap 3.3.1 - https://github.com/twbs/bootstrap/releases/tag/v3.3.1 - Included extra CSS for .close class used on Modal close button.
