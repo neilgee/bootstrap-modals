@@ -1,32 +1,34 @@
 === Plugin Name ===
 
 Contributors: neilgee
-Donate link: http://coolestguidesontheplanet.com/
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=neil%40wpbeaches%2ecom&lc=AU&item_name=WP%20Beaches&item_number=Plugins&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Tags: modals, pop ups, windows, bootstrap
 Requires at least: 3.8
-Tested up to: 4.3
-Stable tag: 1.2.1
+Tested up to: 4.5
+Stable tag: 1.3.0
 Plugin Name: Bootstrap Modals
-Plugin URI: http://coolestguidesontheplanet.com/use-bootstrap-modals-wordpress-themes/
+Plugin URI: http://wpbeaches.com
 Description: Using Bootstrap Modals in WordPress
 Author: Neil Gee
-Version: 1.2.1
+Version: 1.3.0
 Author URI:http://wpbeaches.com
-License:           GPL-2.0+
-License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+License: GPL-2.0+
+License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
-This plugin adds Bootstrap v3.3.5 Modal functionality to WordPress. All you need to do is add the Modal HTML mark up code.
+This plugin adds Bootstrap Modal functionality to WordPress. All you need to do is add the Modal HTML mark up code.
 
 
 == Description ==
 
-This plugin adds Bootstrap v3.3.5 Modal functionality to WordPress.
+This plugin adds Bootstrap v3 Modal functionality to WordPress.
 
-It adds just the Bootstrap Javascript Plugin for Modals and associated CSS.  
+It adds just the Bootstrap Javascript Plugin for Modals and associated CSS.
 
-This does not bring in any other Boostrap javascript or CSS functionality.
+This does not bring in any other Bootstrap javascript or CSS functionality.
 
 There is sample HTML mark up code in the readme.txt for a selector and modal target element.
+
+Options to override the default CSS modal styling and also use a shortcode
 
 == Installation ==
 
@@ -41,7 +43,9 @@ Use either the Bootstrap API markup or Javascript to trigger the modal windows, 
 
 There is also further usage information here: http://coolestguidesontheplanet.com/bootstrap/modal.php
 
-There is no WP-Admin interface, mark up needs to be directly applied to post/page or widget area.
+Mark up needs to be directly applied to post/page or widget area or via a shortcode.
+
+Options to override the default CSS styling.
 
 Here is a simple HTML Modal MarkUp
 <code>
@@ -67,14 +71,28 @@ Since version 1.0.2 extra CSS is included to set the close button to a state sim
 
 == Changelog ==
 
-• 1.0.0 * Initial release.
+== 1.3.0 ==
+* 21st July 2016
+- Added options page in WP Admin Dashboard > Settings > Bootstrap Modal
+- Manual mark up tab
+- CSS style options enable the style of the CSS to be overidden
+- Shortcode now available - Shortcode tab - explains how the shortcode works
 
-• 1.0.1  - 27th June 2014 - Updated with Bootstrap 3.2.0 - https://github.com/twbs/bootstrap/releases/tag/v3.2.0
 
-• 1.0.2  - 13th November 2014 - Updated with Bootstrap 3.3.1 - https://github.com/twbs/bootstrap/releases/tag/v3.3.1 - Included extra CSS for .close class used on Modal close button.
+== 1.2.1 ==
+* 6th September 2015 - Updated with Bootstrap 3.3.5  - CSS change on close button to make circular and position offset off model
 
-• 1.1.0  - 22nd January 2015 - Updated with Bootstrap 3.3.2 - no functional changes for modals.
+== 1.2.0 ==
+* 19th April 2015 - Updated with Bootstrap 3.3.4 - Fixes for a few significant bugs in the Modal plugin.
 
-• 1.2.0 - 19th April 2015 - Updated with Bootstrap 3.3.4 - Fixes for a few significant bugs in the Modal plugin.
+== 1.1.0 ==
+* 22nd January 2015 - Updated with Bootstrap 3.3.2 - no functional changes for modals.
 
-• 1.2.1 - 6th September 2015 - Updated with Bootstrap 3.3.5  - CSS change on close button to make circular and position offset off model
+== 1.0.2 ==
+* 13th November 2014 - Updated with Bootstrap 3.3.1 - https://github.com/twbs/bootstrap/releases/tag/v3.3.1 - Included extra CSS for .close class used on Modal close button.
+
+== 1.0.1 ==
+* 27th June 2014 - Updated with Bootstrap 3.2.0 - https://github.com/twbs/bootstrap/releases/tag/v3.2.0
+
+== 1.0.0 ==
+* Initial release.
