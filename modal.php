@@ -4,7 +4,7 @@ Plugin Name: Bootstrap Modals
 Plugin URI: http://wpbeaches.com
 Description: Using Bootstrap Modals in WordPress
 Author: Neil Gee
-Version: 1.3.0
+Version: 1.3.1
 Author URI:http://wpbeaches.com
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				die;
 }
 
-
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\load_textdomain' );
 /**
 * Register our text domain.
 *
@@ -25,9 +25,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 function load_textdomain() {
 	load_plugin_textdomain( 'bootstrap-modal', false, basename( dirname( __FILE__ ) ) . '/languages' );
 }
-add_action( 'plugins_loaded', __NAMESPACE__ . '\\load_textdomain' );
 
 
+add_action( 'wp_enqueue_scripts',  __NAMESPACE__ . '\\scripts_styles' );
 /**
 * Register and Enqueue Scripts and Styles.
 *
@@ -35,17 +35,19 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\load_textdomain' );
 */
 //Script-tac-ulous -> All the Scripts and Styles Registered and Enqueued, scripts first - then styles
 function scripts_styles() {
+	$options = get_option( 'bootstrap_modal_settings' );	
+	wp_register_script( 'modaljs' , plugins_url( '/js/bootstrap.min.js',  __FILE__), array( 'jquery' ), '3.3.7', true );
+	wp_register_style( 'modalcss' , plugins_url( '/css/bootstrap.css',  __FILE__), '' , '3.3.7', 'all' );
+	wp_register_style( 'custommodalcss' , plugins_url( '/css/custommodal.css',  __FILE__), '' , '3.3.7', 'all' );
+	
 
-	wp_register_script( 'modaljs' , plugins_url( '/js/bootstrap.min.js',  __FILE__), array( 'jquery' ), '3.3.5', true );
-	wp_register_style( 'modalcss' , plugins_url( '/css/bootstrap.css',  __FILE__), '' , '3.3.5', 'all' );
-
-
-	wp_enqueue_script( 'modaljs' );
-	wp_enqueue_style( 'modalcss' );
+	if( $options['ng_modal_disable_bootstrap'] == false ) {
+		wp_enqueue_script( 'modaljs' );
+		wp_enqueue_style( 'modalcss' );
+ 	}
 }
-add_action( 'wp_enqueue_scripts',  __NAMESPACE__ . '\\scripts_styles' );
 
-
+add_action( 'admin_enqueue_scripts',  __NAMESPACE__ . '\\admin_modal' );
 /**
  * Add scripts in back-end.
  *
@@ -55,15 +57,14 @@ function admin_modal($hook) {
     if ( 'settings_page_bootstrap-modal' != $hook ) {
         return;
     }
-    wp_enqueue_script( 'modaljs' , plugins_url( '/js/bootstrap.min.js',  __FILE__), array( 'jquery' ), '3.3.5', true );
-    wp_enqueue_style( 'modalcss' , plugins_url( '/css/bootstrap.css',  __FILE__), '' , '3.3.5', 'all' );
+    wp_enqueue_script( 'modaljs' , plugins_url( '/js/bootstrap.min.js',  __FILE__), array( 'jquery' ), '3.3.7', true );
+    wp_enqueue_style( 'modalcss' , plugins_url( '/css/bootstrap.css',  __FILE__), '' , '3.3.7', 'all' );
     wp_enqueue_style( 'wp-color-picker' );
     wp_enqueue_script( 'wp-color-picker-alpha', plugins_url( '/js/wp-color-picker-alpha.min.js',  __FILE__ ), array( 'wp-color-picker' ), '1.3.0', true );
 }
-add_action( 'admin_enqueue_scripts',  __NAMESPACE__ . '\\admin_modal' );
 
 
-
+add_action( 'admin_menu', __NAMESPACE__ . '\\plugin_page' );
 /**
  * Create the plugin option page.
  *
@@ -72,20 +73,19 @@ add_action( 'admin_enqueue_scripts',  __NAMESPACE__ . '\\admin_modal' );
 
 function plugin_page() {
 
-    /*
-     * Use the add options_page function
-     * add_options_page( $page_title, $menu_title, $capability, $menu-slug, $function )
-     */
+/**
+* Use the add options_page function
+* add_options_page( $page_title, $menu_title, $capability, $menu-slug, $function )
+*/
 
-     add_options_page(
-        __( 'Bootstrap Modal Plugin','bootstrap-modal' ), //$page_title
-        __( 'Bootstrap Modal ', 'bootstrap-modal' ), //$menu_title
-        'manage_options', //$capability
-        'bootstrap-modal', //$menu-slug
-        __NAMESPACE__ . '\\plugin_options_page' //$callbackfunction
-      );
+add_options_page(
+	__( 'Bootstrap Modal Plugin','bootstrap-modal' ), //$page_title
+	__( 'Bootstrap Modal ', 'bootstrap-modal' ), //$menu_title
+	'manage_options', //$capability
+	'bootstrap-modal', //$menu-slug
+	__NAMESPACE__ . '\\plugin_options_page' //$callbackfunction
+	);
 }
-add_action( 'admin_menu', __NAMESPACE__ . '\\plugin_page' );
 
 
 /**
@@ -105,6 +105,7 @@ function plugin_options_page() {
 }
 
 
+add_action('admin_init', __NAMESPACE__ . '\\plugin_settings');
 /**
  * Register our option fields
  *
@@ -194,11 +195,19 @@ function plugin_settings() {
          __NAMESPACE__ . '\\ng_button_color_hover_callback', //callback function below
         'bootstrap-modal', //page that it appears on
         'ng_bootstrap_modal_section' //settings section declared in add_settings_section
+	);
+	
+	add_settings_field(
+        'ng_modal_header_alignment', //unique id of field
+        'Modal Header Alignment', //title
+         __NAMESPACE__ . '\\ng_modal_header_alignment_callback', //callback function below
+        'bootstrap-modal', //page that it appears on
+        'ng_bootstrap_modal_section' //settings section declared in add_settings_section
     );
 
     add_settings_field(
         'ng_modal_alignment', //unique id of field
-        'Modal Header & Body Alignment', //title
+        'Modal Body Alignment', //title
          __NAMESPACE__ . '\\ng_modal_alignment_callback', //callback function below
         'bootstrap-modal', //page that it appears on
         'ng_bootstrap_modal_section' //settings section declared in add_settings_section
@@ -226,10 +235,17 @@ function plugin_settings() {
          __NAMESPACE__ . '\\ng_modal_border_color_callback', //callback function below
         'bootstrap-modal', //page that it appears on
         'ng_bootstrap_modal_section' //settings section declared in add_settings_section
+	);
+	
+	add_settings_field(
+        'ng_modal_disable_bootstrap', //unique id of field
+        'Disable Plugins Bootstrap Files', //title
+        __NAMESPACE__ . '\\ng_modal_disable_bootstrap_callback', //callback function below
+        'bootstrap-modal', //page that it appears on
+        'ng_bootstrap_modal_section' //settings section declared in add_settings_section
     );
 
 }
-add_action('admin_init', __NAMESPACE__ . '\\plugin_settings');
 
 /**
  * Register our section call back
@@ -374,6 +390,28 @@ echo '<input type="text" class="color-picker" data-alpha="true" data-default-col
 }
 
 /**
+ *  Header Alignment
+ *
+ *
+ * @since 1.3.1
+ */
+
+ function ng_modal_header_alignment_callback() {
+	$options = get_option( 'bootstrap_modal_settings' );
+	
+	if( !isset( $options['ng_modal_header_alignment'] ) ) $options['ng_modal_header_alignment'] = 'left';
+	?>
+	
+	<select name="bootstrap_modal_settings[ng_modal_header_alignment]" id="ng_modal_header_alignment">
+		<option selected="selected" value="left" <?php selected($options['ng_modal_header_alignment'], 'left'); ?>>Left</option>
+		<option value="center" <?php selected($options['ng_modal_header_alignment'], 'center'); ?>>Center</option>
+	  <option value="right" <?php selected($options['ng_modal_header_alignment'], 'right'); ?>>Right</option>
+	</select>
+	<?php
+	
+	}
+
+/**
  *  Modal Alignment
  *
  *
@@ -453,7 +491,26 @@ if( !isset( $options['ng_modal_footer_alignment'] ) ) $options['ng_modal_footer_
   echo '<input type="text" class="color-picker" data-alpha="true" data-default-color="#e5e5e5" name="bootstrap_modal_settings[ng_modal_border_color]" value="' . sanitize_text_field($options['ng_modal_border_color']) . '"/>';
   }
 
+ /**
+   *  Disable Plugins Bootstrap Files
+   *
+   *
+   * @since 1.3.1
+   */
 
+   function ng_modal_disable_bootstrap_callback() {
+	$options = get_option( 'bootstrap_modal_settings' );
+	if( !isset( $options['ng_modal_disable_bootstrap'] ) ) $options['ng_modal_disable_bootstrap'] = '';
+ 
+	?>
+	 <fieldset>
+		 <label for="ng_modal_disable_bootstrap">
+			 <input name="bootstrap_modal_settings[ng_modal_disable_bootstrap]" type="checkbox" id="ng_modal_disable_bootstrap" value="1"<?php checked( 1, $options['ng_modal_disable_bootstrap'], true ); ?> />
+			 <span><?php esc_attr_e( 'Disable Plugins Bootstrap Files', 'bootstrap-modal' ); ?></span>
+		 </label>
+	 </fieldset>
+   <?php
+	}
 
   /**
    *  Use Modal CSS
@@ -479,7 +536,7 @@ if( !isset( $options['ng_modal_footer_alignment'] ) ) $options['ng_modal_footer_
 
 
 
-
+add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\inline_modal' );   
 /**
  *  Adding inline CSS
  *
@@ -498,12 +555,15 @@ function inline_modal() {
           'ng_button_color_hover'      => 'rgba(255,255,255,1)',
           'ng_button_background_hover' => 'rgba(0,0,0,0.5)',
           'ng_modal_color'             => 'rgba(0,0,0,1)',
-          'ng_modal_color_background'  => 'rgba(255,255,255,1)',
+		  'ng_modal_color_background'  => 'rgba(255,255,255,1)',
+		  'ng_modal_header_alignment'  => 'left',
           'ng_modal_alignment'         => 'left',
           'ng_modal_footer_alignment'  => 'right',
           'ng_modal_border_color'      => '',
           'ng_modal_use_borders'       => '',
-          'ng_modal_use_css'           => '',
+		  'ng_modal_use_css'           => '',
+		  'ng_modal_disable_bootstrap' => '',
+		  
       );
 
       $options = wp_parse_args( $options, $options_default );
@@ -516,12 +576,15 @@ function inline_modal() {
        $ng_button_color_hover      = $options['ng_button_color_hover'];
        $ng_button_background_hover = $options['ng_button_background_hover'];
        $ng_modal_color             = $options['ng_modal_color'];
-       $ng_modal_color_background  = $options['ng_modal_color_background'];
+	   $ng_modal_color_background  = $options['ng_modal_color_background'];
+	   $ng_modal_header_alignment  = $options['ng_modal_header_alignment'];
        $ng_modal_alignment         = $options['ng_modal_alignment'];
        $ng_modal_footer_alignment  = $options['ng_modal_footer_alignment'];
        $ng_modal_border_color      = $options['ng_modal_border_color'];
        $ng_modal_use_borders       = $options['ng_modal_use_borders'];
-       $ng_modal_use_css           = $options['ng_modal_use_css'];
+	   $ng_modal_use_css           = $options['ng_modal_use_css'];
+	   $ng_modal_disable_bootstrap = $options['ng_modal_disable_bootstrap'];
+	   
 
 
 
@@ -529,46 +592,68 @@ function inline_modal() {
         //All the user input CSS settings as set in bootstrap modal settings
       if($ng_modal_use_css) {
         $modal_custom_css = "
-        .modal-backdrop{
+		.modal .modal-backdrop,
+		.modal {
           background: {$ng_overlay};
         }
-        .modal-backdrop.in {
+        .modal .modal-backdrop.in {
           opacity: {$ng_overlay_opacity};
         }
-        .modal-content .close {
+        .modal-dialog .modal-content .close {
           color: {$ng_button_color};
-          background: {$ng_button_background};
+		  background: {$ng_button_background};
+		  opacity: 1;
+		  text-shadow: none;
+		  position: absolute;
+		  right: -15px;
+		  top: -15px;
         }
-        .modal-content .close:hover {
+        .modal-dialog .modal-content .close:hover {
           color: {$ng_button_color_hover};
-          background: {$ng_button_background_hover};
-        }
-        .modal-content {
+		  background: {$ng_button_background_hover};
+		  border: none;
+		}
+		.modal-dialog .modal-title {
+			color: {$ng_modal_color};
+		}
+        .modal-dialog .modal-content {
           color: {$ng_modal_color};
           background: {$ng_modal_color_background};
-        }
+		}
+		.modal-dialog .modal-header{
+			text-align:{$ng_modal_header_alignment};
+			position: relative;
+		}
         .modal-dialog {
           text-align:{$ng_modal_alignment};
         }
-        .modal-footer {
+        .modal-dialog .modal-footer {
           text-align:{$ng_modal_footer_alignment};
-        }
+		}
+		.admin-bar  .modal.in .modal-dialog {
+			top: 46px;
+		}
+		@media screen and (min-width: 783px) {
+			.admin-bar  .modal.in .modal-dialog {
+				top: 32px;
+			}
+		}
         ";
         if($ng_modal_use_borders) {
           $modal_custom_css .= "
-        .modal-header {
-          border-bottom: 1px solid {$ng_modal_border_color};
+		.modal-dialog .modal-header {
+		  border-bottom: 1px solid {$ng_modal_border_color};
         }
-        .modal-footer {
+        .modal-dialog .modal-footer {
           border-top: 1px solid {$ng_modal_border_color};
         }";
         }
         else {
           $modal_custom_css .="
-        .modal-header {
-          border-bottom: none;
+		.modal-dialog .modal-header {
+		  border-bottom: none;
         }
-        .modal-footer {
+        .modal-dialog .modal-footer {
           border-top: none;
         }
         ";
@@ -576,15 +661,32 @@ function inline_modal() {
       }
       else {
         $modal_custom_css = "";
-      }
-
-  //add the above custom CSS via wp_add_inline_style
-  wp_add_inline_style( 'modalcss', $modal_custom_css );
+	  }
+	  if( $options['ng_modal_disable_bootstrap'] == true ) {
+		
+		$modal_custom_css .= "
+		.modal-dialog .modal-content .close {
+			color: {$ng_button_color};
+			background: {$ng_button_background};
+			opacity: 1;
+			text-shadow: none;
+			position: relative;
+			right: 0;
+			top: 0;
+		  }";
+		
+		wp_enqueue_style( 'custommodalcss' );
+		//add the above custom CSS via wp_add_inline_style
+		wp_add_inline_style( 'custommodalcss', $modal_custom_css );
+	  }
+	  else {
+		  //add the above custom CSS via wp_add_inline_style
+		wp_add_inline_style( 'modalcss', $modal_custom_css );  
+	  }
 }
 
-add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\inline_modal' );
 
-
+add_shortcode( 'bs_modal', __NAMESPACE__ . '\\bm_shortcode' );
 /**
  *  Output Bootstrap Modal shortcode
  *
@@ -594,39 +696,38 @@ add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\inline_modal' );
 function bm_shortcode( $atts, $content = null ) {
 
 	$atts = shortcode_atts(
-					array(
-						'id' 	      => '',
-						'class'     => '',
-						'header'    => '',
-						'footer'    => '',
-						'arialabel' => '',
-					),
-					$atts,
-					'bs_modal'
-				 );
+		array(
+			'id' 	      => '',
+			'class'     => '',
+			'header'    => '',
+			'footer'    => '',
+			'arialabel' => '',
+		),
+		$atts,
+		'bs_modal'
+		);
 
-				 ?>
-				<div id="<?php esc_attr_e( $atts['id']); ?>" class="modal fade" tabindex="-1" role="dialog" <?php if( $atts['arialabel'] ) : ?>aria-labelledby="<?php esc_attr_e($atts['arialabel']); ?>"<?php endif; ?>>
-				    <div class="modal-dialog <?php esc_attr_e($atts['class']); ?>" role="document">
-				        <div class="modal-content">
-				            <div class="modal-header">
-				                <button class="close" type="button" data-dismiss="modal" aria-label="Close">×</button>
-												<?php if( $atts['header'] ) : ?>
-				                    <h4 class="modal-title" <?php if( $atts['arialabel'] ) : ?>aria-labelledby="<?php esc_attr_e($atts['arialabel']); ?>"<?php endif; ?>><?php echo $atts['header']; ?></h4>
-													<?php endif; ?>
-				            </div>
-				            <div class="modal-body"><?php echo $content; ?></div>
-											<?php if( $atts['footer'] ) : ?>
-				            <div class="modal-footer"><?php echo $atts['footer']; ?></div>
-									<?php endif; ?>
-				        </div>
-				    </div>
+		?>
+	<div id="<?php esc_attr_e( $atts['id']); ?>" class="modal fade" tabindex="-1" role="dialog" <?php if( $atts['arialabel'] ) : ?>aria-labelledby="<?php esc_attr_e($atts['arialabel']); ?>"<?php endif; ?>>
+		<div class="modal-dialog <?php esc_attr_e($atts['class']); ?>" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button class="close" type="button" data-dismiss="modal" aria-label="Close">×</button>
+									<?php if( $atts['header'] ) : ?>
+						<h4 class="modal-title" <?php if( $atts['arialabel'] ) : ?>aria-labelledby="<?php esc_attr_e($atts['arialabel']); ?>"<?php endif; ?>><?php echo $atts['header']; ?></h4>
+										<?php endif; ?>
 				</div>
-				<?php
-				}
+				<div class="modal-body"><?php echo $content; ?></div>
+								<?php if( $atts['footer'] ) : ?>
+				<div class="modal-footer"><?php echo $atts['footer']; ?></div>
+						<?php endif; ?>
+			</div>
+		</div>
+	</div>
+<?php
+}
 
-add_shortcode( 'bs_modal', __NAMESPACE__ . '\\bm_shortcode' );
-
+add_shortcode( 'bs_trigger', __NAMESPACE__ . '\\bm__trigger_shortcode' );			
 /**
  *  Output Bootstrap Modal Trigger shortcode
  *
@@ -636,19 +737,18 @@ add_shortcode( 'bs_modal', __NAMESPACE__ . '\\bm_shortcode' );
 function bm__trigger_shortcode( $atts, $content = null ) {
 
 	$atts = shortcode_atts(
-					array(
-						'id' 	      => '',
-						'class'     => '',
-						'arialabel' => '',
-					),
-					$atts,
-					'bs_trigger'
-				 );
+		array(
+			'id' 	    => '',
+			'class'     => '',
+			'arialabel' => '',
+		),
+		$atts,
+			'bs_trigger'
+		);
 
-				 ?>
-				 <a class="btn btn-primary btn-lg <?php esc_attr_e($atts['class']); ?>" href="#<?php esc_attr_e($atts['id']); ?>" data-toggle="modal"><?php echo $content; ?></a>
+		?>
+		<a class="btn btn-primary btn-lg <?php esc_attr_e($atts['class']); ?>" href="#<?php esc_attr_e($atts['id']); ?>" data-toggle="modal"><?php echo $content; ?></a>
 
-				<?php
-				}
+<?php
+}
 
-add_shortcode( 'bs_trigger', __NAMESPACE__ . '\\bm__trigger_shortcode' );
