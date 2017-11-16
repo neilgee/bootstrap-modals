@@ -4,7 +4,7 @@ Plugin Name: Bootstrap Modals
 Plugin URI: http://wpbeaches.com
 Description: Using Bootstrap Modals in WordPress
 Author: Neil Gee
-Version: 1.3.1
+Version: 1.3.2
 Author URI:http://wpbeaches.com
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
@@ -35,7 +35,12 @@ add_action( 'wp_enqueue_scripts',  __NAMESPACE__ . '\\scripts_styles' );
 */
 //Script-tac-ulous -> All the Scripts and Styles Registered and Enqueued, scripts first - then styles
 function scripts_styles() {
-	$options = get_option( 'bootstrap_modal_settings' );	
+  $options = get_option( 'bootstrap_modal_settings' );	
+  $options_default = array(
+    'ng_modal_disable_bootstrap' => '',  
+    );
+    $options = wp_parse_args( $options, $options_default );
+
 	wp_register_script( 'modaljs' , plugins_url( '/js/bootstrap.min.js',  __FILE__), array( 'jquery' ), '3.3.7', true );
 	wp_register_style( 'modalcss' , plugins_url( '/css/bootstrap.css',  __FILE__), '' , '3.3.7', 'all' );
 	wp_register_style( 'custommodalcss' , plugins_url( '/css/custommodal.css',  __FILE__), '' , '3.3.7', 'all' );
@@ -60,7 +65,7 @@ function admin_modal($hook) {
     wp_enqueue_script( 'modaljs' , plugins_url( '/js/bootstrap.min.js',  __FILE__), array( 'jquery' ), '3.3.7', true );
     wp_enqueue_style( 'modalcss' , plugins_url( '/css/bootstrap.css',  __FILE__), '' , '3.3.7', 'all' );
     wp_enqueue_style( 'wp-color-picker' );
-    wp_enqueue_script( 'wp-color-picker-alpha', plugins_url( '/js/wp-color-picker-alpha.min.js',  __FILE__ ), array( 'wp-color-picker' ), '1.3.0', true );
+    wp_enqueue_script( 'wp-color-picker-alpha', plugins_url( '/js/wp-color-picker-alpha.min.js',  __FILE__ ), array( 'wp-color-picker' ), '2.1.2', true );
 }
 
 
@@ -569,21 +574,21 @@ function inline_modal() {
       $options = wp_parse_args( $options, $options_default );
 
 
-       $ng_overlay                 = $options['ng_overlay'];
-       $ng_overlay_opacity         = $options['ng_overlay_opacity'];
-       $ng_button_color            = $options['ng_button_color'];
-       $ng_button_background       = $options['ng_button_background'];
-       $ng_button_color_hover      = $options['ng_button_color_hover'];
-       $ng_button_background_hover = $options['ng_button_background_hover'];
-       $ng_modal_color             = $options['ng_modal_color'];
-	   $ng_modal_color_background  = $options['ng_modal_color_background'];
-	   $ng_modal_header_alignment  = $options['ng_modal_header_alignment'];
-       $ng_modal_alignment         = $options['ng_modal_alignment'];
-       $ng_modal_footer_alignment  = $options['ng_modal_footer_alignment'];
-       $ng_modal_border_color      = $options['ng_modal_border_color'];
-       $ng_modal_use_borders       = $options['ng_modal_use_borders'];
-	   $ng_modal_use_css           = $options['ng_modal_use_css'];
-	   $ng_modal_disable_bootstrap = $options['ng_modal_disable_bootstrap'];
+		$ng_overlay                 = $options['ng_overlay'];
+		$ng_overlay_opacity         = $options['ng_overlay_opacity'];
+		$ng_button_color            = $options['ng_button_color'];
+		$ng_button_background       = $options['ng_button_background'];
+		$ng_button_color_hover      = $options['ng_button_color_hover'];
+		$ng_button_background_hover = $options['ng_button_background_hover'];
+		$ng_modal_color             = $options['ng_modal_color'];
+		$ng_modal_color_background  = $options['ng_modal_color_background'];
+		$ng_modal_header_alignment  = $options['ng_modal_header_alignment'];
+		$ng_modal_alignment         = $options['ng_modal_alignment'];
+		$ng_modal_footer_alignment  = $options['ng_modal_footer_alignment'];
+		$ng_modal_border_color      = $options['ng_modal_border_color'];
+		$ng_modal_use_borders       = $options['ng_modal_use_borders'];
+		$ng_modal_use_css           = $options['ng_modal_use_css'];
+		$ng_modal_disable_bootstrap = $options['ng_modal_disable_bootstrap'];
 	   
 
 

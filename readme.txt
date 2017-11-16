@@ -4,13 +4,13 @@ Contributors: neilgee
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=neil%40wpbeaches%2ecom&lc=AU&item_name=WP%20Beaches&item_number=Plugins&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted
 Tags: modals, pop ups, windows, bootstrap
 Requires at least: 3.8
-Tested up to: 4.8
-Stable tag: 1.3.1
+Tested up to: 4.9
+Stable tag: 1.3.2
 Plugin Name: Bootstrap Modals
 Plugin URI: http://wpbeaches.com
 Description: Using Bootstrap Modals in WordPress
 Author: Neil Gee
-Version: 1.3.1
+Version: 1.3.2
 Author URI:http://wpbeaches.com
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
@@ -95,6 +95,15 @@ You can change the modal size by adding an extra CSS class to the <strong>.modal
 Since version 1.0.2 extra CSS is included to set the close button to a state similar to Bootstrap install, to override the default CSS for the close button use a CSS selector .modal-dialog .close { } in your CSS styles.
 
 == Changelog ==
+
+= 1.3.2
+* 17/11/17
+* Update wp-color-picker to 2.1.2 to be compatible with WP 4.9
+
+= 1.3.1.1 =
+* 15th September 2017
+- Fix undefined notice
+- Compatible with WP 4.9
 
 = 1.3.1 =
 * 8th September 2017
